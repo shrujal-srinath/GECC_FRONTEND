@@ -2,27 +2,48 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, Outlet } from 'react-router-dom';
 import axios from 'axios';
 import PlayerDetail from './PlayerDetail';
-import Leaderboards from './Leaderboards'; // 👈 Import the new component
-import './App.css';
+import Leaderboards from './Leaderboards';
+import './App.css'; // Your original App.css import
 
 // This component provides a consistent layout with navigation
 function Layout() {
   return (
-    <div>
-      <header>
-        <nav>
-          <Link to="/">Player List</Link> | <Link to="/leaderboards">Leaderboards</Link>
+    // Set a site-wide dark theme and font
+    <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
+      <header className="bg-gray-800 shadow-md">
+        <nav className="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
+          {/* Site Title / Home Link */}
+          <Link to="/" className="text-2xl font-bold text-white hover:text-green-400 transition-colors">
+            GECC Stats
+          </Link>
+          
+          {/* Navigation Links */}
+          <div className="flex gap-6">
+            <Link 
+              to="/" 
+              className="text-lg text-gray-300 hover:text-green-400 transition-colors"
+            >
+              Players
+            </Link>
+            <Link 
+              to="/leaderboards" 
+              className="text-lg text-gray-300 hover:text-green-400 transition-colors"
+            >
+              Leaderboards
+            </Link>
+          </div>
         </nav>
       </header>
-      <hr />
-      <main>
+      
+      {/* Main content area where child routes will render */}
+      <main className="container mx-auto max-w-7xl p-6">
         <Outlet /> {/* Child routes will render here */}
       </main>
     </div>
   );
 }
 
-// This is the Player List Component
+// This is the Player List Component (functionality unchanged, but it will now live inside the styled Layout)
 function PlayerList() {
   const [players, setPlayers] = useState([]);
 
@@ -38,12 +59,19 @@ function PlayerList() {
 
   return (
     <div>
-      <h1>Godrej Eternity Cricket Stats</h1>
-      <h2>Player List</h2>
-      <ul>
+      {/* This title will now appear BELOW the nav bar */}
+      <h1 className="text-4xl font-bold mb-6 text-white">All Players</h1>
+      
+      {/* We will style this list properly in the next step */}
+      <ul className="list-disc pl-5"> 
         {players.map(player => (
-          <li key={player.id}>
-            <Link to={`/players/${player.id}`}>{player.name}</Link>
+          <li key={player.id} className="mb-2">
+            <Link 
+              to={`/players/${player.id}`} 
+              className="text-lg text-green-400 hover:text-green-300 hover:underline"
+            >
+              {player.name}
+            </Link>
           </li>
         ))}
       </ul>
@@ -51,7 +79,7 @@ function PlayerList() {
   );
 }
 
-// This is the main App component that controls routing
+// This is the main App component that controls routing (functionality unchanged)
 function App() {
   return (
     <Routes>
