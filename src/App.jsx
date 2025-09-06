@@ -1,8 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, Outlet } from 'react-router-dom';
 import axios from 'axios';
-import PlayerDetail from './PlayerDetail'; // Import the new component
+import PlayerDetail from './PlayerDetail';
+import Leaderboards from './Leaderboards'; // 👈 Import the new component
 import './App.css';
+
+// This component provides a consistent layout with navigation
+function Layout() {
+  return (
+    <div>
+      <header>
+        <nav>
+          <Link to="/">Player List</Link> | <Link to="/leaderboards">Leaderboards</Link>
+        </nav>
+      </header>
+      <hr />
+      <main>
+        <Outlet /> {/* Child routes will render here */}
+      </main>
+    </div>
+  );
+}
 
 // This is the Player List Component
 function PlayerList() {
@@ -37,8 +55,11 @@ function PlayerList() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<PlayerList />} />
-      <Route path="/players/:playerId" element={<PlayerDetail />} />
+      <Route path="/" element={<Layout />}>
+        <Route index element={<PlayerList />} />
+        <Route path="leaderboards" element={<Leaderboards />} />
+        <Route path="players/:playerId" element={<PlayerDetail />} />
+      </Route>
     </Routes>
   );
 }

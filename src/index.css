@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add some basic table styling */
+table {
+  @apply w-full text-left border-collapse mt-4 mb-8;
+}
+
+th, td {
+  @apply border-b border-gray-200 p-2;
+}
+
+thead th {
+  @apply font-semibold bg-gray-100;
+}
+
+tbody tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.player-profile {
+    @apply flex gap-6 my-4 p-4 bg-gray-100 rounded-lg justify-center;
+}
