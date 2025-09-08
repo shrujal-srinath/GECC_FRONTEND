@@ -5,8 +5,9 @@ import axios from 'axios';
 // Helper function to format averages/strike rates to 2 decimal places
 const formatNum = (num) => {
   const floatNum = parseFloat(num);
-  // Return '-' if num is null, 0, or NaN, otherwise format it
-  return (floatNum && floatNum !== 0) ? floatNum.toFixed(2) : '-';
+  // Return '-' if num is null, or NaN, otherwise format it. Return 0 for 0
+  if (num === 0) return 0;
+  return (floatNum) ? floatNum.toFixed(2) : '-';
 };
 
 // A new component for the career summary stat block
@@ -20,40 +21,31 @@ const CareerStatBlock = ({ label, value }) => (
 
 function PlayerDetail() {
   const [player, setPlayer] = useState(null);
-  const [careerStats, setCareerStats] = useState(null); // 👈 1. ADD NEW STATE FOR CAREER STATS
+  const [careerStats, setCareerStats] = useState(null);
   const { playerId } = useParams();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This fetches the main player profile and tournament list
-    axios.get(`http://127.0.0.1:8000/api/players/${playerId}/`)
+    // This fetches the main player profile and all stats in a single call
+    axios.get(`http://127.0.0.1:8000/api/players/${playerId}/career_summary/`)
       .then(response => {
         setPlayer(response.data);
+        setCareerStats(response.data.career_summary);
+        setLoading(false);
       })
       .catch(error => {
         console.error('There was an error fetching the player details!', error);
+        setLoading(false);
       });
   }, [playerId]);
 
-  // 👈 2. ADD NEW EFFECT TO FETCH CAREER STATS
-  useEffect(() => {
-    // This fetches the career stats for ALL players
-    axios.get('http://127.0.0.1:8000/api/career-stats/')
-      .then(response => {
-        // We need to find OUR player in the list from the API
-        const allStats = response.data;
-        // Note: we parse playerId from URL params (which is a string) to an integer for a strict match
-        const foundStats = allStats.find(stat => stat.id === parseInt(playerId)); 
-        setCareerStats(foundStats);
-      })
-      .catch(error => {
-        console.error('There was an error fetching the career stats!', error);
-      });
-  }, [playerId]); // This also runs when the playerId changes
-
-
-  // Update the loading guard to wait for BOTH API calls
-  if (!player || !careerStats) {
+  if (loading) {
     return <div className="text-center text-xl text-gray-400">Loading player data...</div>;
+  }
+
+  // Handle case where no player is found
+  if (!player) {
+    return <div className="text-center text-xl text-red-400">Player not found.</div>;
   }
 
   return (
@@ -86,13 +78,13 @@ function PlayerDetail() {
         </div>
       </div>
 
-      {/* 👈 3. ADD THE NEW CAREER SUMMARY JSX */}
+      {/* Career Summary JSX (unchanged) */}
       <h2 className="text-3xl font-semibold mb-4">Career Summary</h2>
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
           <CareerStatBlock label="Matches" value={careerStats.total_matches} />
           <CareerStatBlock label="Total Runs" value={careerStats.total_runs} />
-          <CareerStatBlock label="Highest Score" value={careerStats.career_highest_score} />
+          <CareerStatBlock label="Highest Score" value={careerStats.career_highest_score ?? '-'} />
           <CareerStatBlock label="Total Wickets" value={careerStats.total_wickets} />
           <CareerStatBlock label="Total Fours" value={careerStats.total_fours} />
           <CareerStatBlock label="Total Sixes" value={careerStats.total_sixes} />
@@ -102,7 +94,7 @@ function PlayerDetail() {
       </div>
 
 
-      {/* --- Batting Stats Table (Unchanged) --- */}
+      {/* --- Batting Stats Table (Responsive) --- */}
       <h2 className="text-3xl font-semibold mb-4">Batting by Tournament</h2>
       <div className="overflow-x-auto rounded-lg shadow-md mb-8">
         <table className="w-full min-w-max text-left">
@@ -141,7 +133,7 @@ function PlayerDetail() {
         </table>
       </div>
 
-      {/* --- Bowling Stats Table (Unchanged) --- */}
+      {/* --- Bowling Stats Table (Responsive) --- */}
       <h2 className="text-3xl font-semibold mb-4">Bowling by Tournament</h2>
       <div className="overflow-x-auto rounded-lg shadow-md">
         <table className="w-full min-w-max text-left">
