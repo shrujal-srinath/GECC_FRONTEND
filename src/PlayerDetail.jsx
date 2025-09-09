@@ -2,22 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
-// Helper function to format averages/strike rates to 2 decimal places
 const formatNum = (num) => {
   const floatNum = parseFloat(num);
-  // Return '-' if num is null, or NaN, otherwise format it. Return 0 for 0
-  if (num === 0) return 0;
-  return (floatNum) ? floatNum.toFixed(2) : '-';
+  if (num === null || num === undefined) {
+    return '-';
+  }
+  if (floatNum === 0) {
+    return '-';
+  }
+  return floatNum.toFixed(2);
 };
 
-// A new component for the career summary stat block
 const CareerStatBlock = ({ label, value }) => (
   <div className="text-center md:text-left">
     <span className="font-semibold text-gray-400 block uppercase text-sm tracking-wider">{label}</span>
     <span className="text-3xl font-bold text-white">{value ?? '-'}</span>
   </div>
 );
-
 
 function PlayerDetail() {
   const [player, setPlayer] = useState(null);
@@ -26,7 +27,6 @@ function PlayerDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // This fetches the main player profile and all stats in a single call
     axios.get(`http://127.0.0.1:8000/api/players/${playerId}/career_summary/`)
       .then(response => {
         setPlayer(response.data);
@@ -43,43 +43,49 @@ function PlayerDetail() {
     return <div className="text-center text-xl text-gray-400">Loading player data...</div>;
   }
 
-  // Handle case where no player is found
   if (!player) {
     return <div className="text-center text-xl text-red-400">Player not found.</div>;
   }
 
+  const playerPhotoUrl = player.photo ? `http://127.0.0.1:8000${player.photo}` : 'https://via.placeholder.com/150';
+
   return (
     <div className="text-white">
-      {/* Back Link (unchanged) */}
       <Link 
-        to="/" 
+        to="/players" 
         className="inline-block mb-6 text-green-400 hover:text-green-300 transition-colors"
       >
         &larr; Back to Player List
       </Link>
       
-      <h1 className="text-5xl font-bold mb-4">{player.name}</h1>
-
-      {/* Player Profile Box (unchanged) */}
-      <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-        <div className="flex flex-wrap gap-x-12 gap-y-4">
-          <div className="text-lg">
-            <span className="font-semibold text-gray-400 block uppercase text-sm tracking-wider">Role</span>
-            <span className="text-xl">{player.playing_role || 'N/A'}</span>
-          </div>
-          <div className="text-lg">
-            <span className="font-semibold text-gray-400 block uppercase text-sm tracking-wider">Batting Hand</span>
-            <span className="text-xl">{player.batting_style || 'N/A'}</span>
-          </div>
-          <div className="text-lg">
-            <span className="font-semibold text-gray-400 block uppercase text-sm tracking-wider">Bowling Style</span>
-            <span className="text-xl">{player.bowling_style || 'N/A'}</span>
+      <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8 flex flex-col md:flex-row items-center gap-8">
+        <div className="flex-shrink-0">
+          <img 
+            src={playerPhotoUrl}
+            alt={player.name} 
+            className="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-green-400 object-cover" 
+          />
+        </div>
+        <div className="text-center md:text-left">
+          <h1 className="text-5xl md:text-6xl font-bold mb-2">{player.name}</h1>
+          <div className="flex flex-wrap gap-x-8 gap-y-2 justify-center md:justify-start text-lg text-gray-300">
+            <span>
+              <span className="font-semibold block uppercase text-sm tracking-wider">Role:</span>
+              <span className="text-xl text-white">{player.playing_role || 'N/A'}</span>
+            </span>
+            <span>
+              <span className="font-semibold block uppercase text-sm tracking-wider">Batting:</span>
+              <span className="text-xl text-white">{player.batting_style || 'N/A'}</span>
+            </span>
+            <span>
+              <span className="font-semibold block uppercase text-sm tracking-wider">Bowling:</span>
+              <span className="text-xl text-white">{player.bowling_style || 'N/A'}</span>
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Career Summary JSX (unchanged) */}
-      <h2 className="text-3xl font-semibold mb-4">Career Summary</h2>
+      <h2 className="text-3xl font-semibold mb-4 text-center md:text-left">Career Summary</h2>
       <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-4">
           <CareerStatBlock label="Matches" value={careerStats.total_matches} />
@@ -93,9 +99,7 @@ function PlayerDetail() {
         </div>
       </div>
 
-
-      {/* --- Batting Stats Table (Responsive) --- */}
-      <h2 className="text-3xl font-semibold mb-4">Batting by Tournament</h2>
+      <h2 className="text-3xl font-semibold mb-4 text-center md:text-left">Batting by Tournament</h2>
       <div className="overflow-x-auto rounded-lg shadow-md mb-8">
         <table className="w-full min-w-max text-left">
           <thead className="bg-gray-700 text-gray-300 uppercase text-sm">
@@ -133,8 +137,7 @@ function PlayerDetail() {
         </table>
       </div>
 
-      {/* --- Bowling Stats Table (Responsive) --- */}
-      <h2 className="text-3xl font-semibold mb-4">Bowling by Tournament</h2>
+      <h2 className="text-3xl font-semibold mb-4 text-center md:text-left">Bowling by Tournament</h2>
       <div className="overflow-x-auto rounded-lg shadow-md">
         <table className="w-full min-w-max text-left">
           <thead className="bg-gray-700 text-gray-300 uppercase text-sm">

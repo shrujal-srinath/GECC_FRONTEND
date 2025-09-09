@@ -1,15 +1,17 @@
 import React from 'react';
-import TopPerformers from './TopPerformers'; // 👈 IMPORT THE NEW COMPONENT
+import TopPerformers from './TopPerformers';
+import RecentMatches from './RecentMatches'; // 👈 IMPORT THE NEW COMPONENT
 
 function Home() {
   return (
-    <div className="text-center text-white">
-      <h1 className="text-6xl font-bold mb-4 text-green-400">Welcome to the GECC!</h1>
-      <p className="text-xl">Your one-stop destination for all Godrej Eternity Cricket stats and news.</p>
+    <div className="text-white">
+      <h1 className="text-6xl font-bold mb-4 text-center text-green-400">Welcome to the GECC!</h1>
+      <p className="text-xl text-center">Your one-stop destination for all Godrej Eternity Cricket stats and news.</p>
       
-      {/* 👈 RENDER THE NEW TOP PERFORMERS COMPONENT */}
       <TopPerformers />
-
+      
+      {/* 👈 RENDER THE NEW RECENT MATCHES COMPONENT HERE */}
+      <RecentMatches />
     </div>
   );
 }
